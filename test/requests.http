@@ -16,4 +16,13 @@ content-type: application/json
 ### POST /items error
 POST http://localhost:3000/items
 
-{"jotain": "jotan"}
+{"jotain": "jotain"}
+
+### DELETE /items/:id
+DELETE http://localhost:3000/items/19
+
+### PUT /items/:id
+PUT http://localhost:3000/items/29
+content-type: application/json
+
+{"id": 29, "name": "peruna"}
