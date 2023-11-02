@@ -1,0 +1,19 @@
+### GET /
+GET http://localhost:3000/
+
+### GET /items
+GET http://localhost:3000/api/items?limit=x
+
+### GET /items/:id
+GET http://localhost:3000/api/items/20
+
+### POST /items
+POST http://localhost:3000/api/items
+content-type: application/json
+
+{"name": "kurkku"}
+
+### POST /items error
+POST http://localhost:3000/api/items
+
+{"jotain": "jotan"}
