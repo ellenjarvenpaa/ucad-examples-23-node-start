@@ -1,19 +1,37 @@
 ### GET /
-GET http://localhost:3000/
+GET http://localhost:3000
 
-### GET /items
-GET http://localhost:3000/api/items?limit=x
+### GET /media
+GET http://localhost:3000/api/media
 
-### GET /items/:id
-GET http://localhost:3000/api/items/20
+### GET /media/:id
+GET http://localhost:3000/api/media/9590
 
-### POST /items
-POST http://localhost:3000/api/items
+### POST /media
+POST http://localhost:3000/api/media
 content-type: application/json
 
-{"name": "kurkku"}
+{
+  "filename": "60ac.jpg",
+  "title": "New image",
+  "description": "The description of the new image",
+  "user_id": 305,
+  "media_type": "image/jpeg",
+}
 
-### POST /items error
-POST http://localhost:3000/api/items
+### POST /media error
+POST http://localhost:3000/api/media
 
-{"jotain": "jotan"}
+{"jotain": "jotain"}
+
+### DELETE /media/:id
+DELETE http://localhost:3000/api/media/9590
+
+### PUT /media/:id
+PUT http://localhost:3000/api/media/9590
+content-type: application/json
+
+{
+  "title": "Basement modified",
+  "description": "Some new description",
+}
