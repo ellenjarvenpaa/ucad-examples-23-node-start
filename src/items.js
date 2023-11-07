@@ -73,37 +73,43 @@ const getItems = (req, res) => {
  * @param {*} res
  */
 const getItemsById = (req, res) => {
-  // if item with id exists send it, otherwise send 404
-  console.log("getItemsById", req.params);
-  const item = mediaItems.find((element) => element.id == req.params.id);
+  const item = mediaItems.find((element) => element.media_id == req.params.id);
   if (item) {
     res.json(item);
   } else {
-    res.status(404);
-    res.json({ message: "Item not found." });
+    res.status(404).json({ message: "Item not found." });
   }
 };
 
 const postItem = (req, res) => {
   console.log("new item posted", req.body);
-  // TODO: check last weeks example for generating an id
-  if (req.body.name) {
-    mediaItems.push({ id: 0, name: req.body.name });
+  if (
+    req.body.filename &&
+    req.body.title &&
+    req.body.description &&
+    req.body.user_id &&
+    req.body.media_type
+  ) {
+    mediaItems.push({
+      filename: req.dody.filename,
+      title: req.body.title,
+      description: req.body.description,
+      user_id: req.body.user_id,
+      media_type: req.body.media_type,
+    });
     res.sendStatus(201);
   } else {
     res.sendStatus(400);
   }
 };
 
-const deleteItem = (res, id) => {
-  const index = mediaItems.findIndex((item) => item.id == id);
+const deleteItem = (req, res, id) => {
+  const index = mediaItems.findIndex((item) => item.media_id == id);
   if (index !== -1) {
     mediaItems.splice(index, 1);
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(`{"message": "Item with id ${id} deleted."}`);
+    res.status(200).json({ message: `Item with id ${id} deleted.` });
   } else {
-    res.writeHead(404, { "Content-Type": "application/json" });
-    res.end('{"message": "Item not found."}');
+    res.status(404).json({ message: "Item not found." });
   }
 };
 
@@ -120,19 +126,17 @@ const putItem = (req, res, id) => {
       body = Buffer.concat(body).toString();
       console.log("req body", body);
       body = JSON.parse(body);
-      if (!body.name) {
-        res.writeHead(400, { "Content-Type": "application/json" });
-        res.end(`{"message": "Missing data."}`);
+      if (!body.title || !body.description) {
+        res.status(400).json({ message: "Missing data." });
         return;
       }
-      const index = mediaItems.findIndex((item) => item.id == id);
+      const index = mediaItems.findIndex((item) => item.media_id == id);
       if (index !== -1) {
-        mediaItems[index].name = body.name;
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(`{"message": "Item with id ${id} updated."}`);
+        mediaItems[index].title = body.title;
+        mediaItems[index].description = body.description;
+        res.status(200).json({ message: `Item with id ${id} updated.` });
       } else {
-        res.writeHead(404, { "Content-Type": "application/json" });
-        res.end('{"message": "Item not found."}');
+        res.status(404).json({ message: "Item not found." });
       }
     });
 };
