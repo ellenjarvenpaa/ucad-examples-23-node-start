@@ -8,6 +8,13 @@ import {
   deleteItem,
   putItem,
 } from "./items.js";
+import {
+  getUsers,
+  getUserById,
+  postUser,
+  deleteUser,
+  putUser,
+} from "./users.js";
 
 const hostname = "127.0.0.1";
 const app = express();
@@ -60,6 +67,17 @@ app.put("/api/media", putItem);
 app.post("/api/media", postItem);
 // remove existing item
 app.delete("/api/media", deleteItem);
+
+// get all items
+app.get("/api/user", getUsers);
+// get items by id
+app.get("/api/user/:id", getUserById);
+// modify
+app.put("/api/user", putUser);
+// add new item
+app.post("/api/user", postUser);
+// remove existing item
+app.delete("/api/user", deleteUser);
 
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
