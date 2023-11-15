@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import mediaRouter from "./routes/media-router.mjs";
 import userRouter from "./routes/user-router.mjs";
+import { logger } from "./middlewares/middlewares.mjs";
 
 const hostname = "127.0.0.1";
 const app = express();
@@ -14,32 +15,19 @@ app.set("view engine", "pug");
 app.set("views", "src/views");
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/docs", express.static(path.join(__dirname, "../docs")));
+// serve uploaded mediafiles url: /media/{file}
+app.use("/media", express.static(path.join(__dirname, "../uploads")));
 
-// simple custom middleware for loggin/debugging all requests
-app.use((req, res, next) => {
-  console.log("Time:", Date.now(), req.method, req.url);
-  next();
-});
+// simple custom middleware for logging/debugging all requests
+app.use(logger);
 
 app.get("/", (req, res) => {
   const values = {
     title: "Dummy REST API for media",
     message: "Media will be displayed here",
   };
-  res.render("home", values);
-});
-
-// dummy routing example
-app.get("/kukkuu", (request, response) => {
-  const myResponse = { message: "No moro!" };
-  //response.json(myResponse);
-  response.sendStatus(200);
-});
-
-// other dummy pug example
-app.get("/:message", (req, res) => {
-  const values = { title: "Dummy REST API docs", message: req.params.message };
   res.render("home", values);
 });
 
