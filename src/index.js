@@ -2,19 +2,13 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import {
-  getItems,
-  getItemsById,
-  postItem,
-  deleteItem,
-  putItem,
-} from "./items.js";
-import {
   getUsers,
   getUserById,
   postUser,
   deleteUser,
   putUser,
-} from "./users.js";
+} from "./controllers/users-controller.mjs";
+import mediaRouter from "./routes/media-router.mjs";
 
 const hostname = "127.0.0.1";
 const app = express();
@@ -55,18 +49,8 @@ app.get("/:message", (req, res) => {
   res.render("home", values);
 });
 
-// example generic items api
-
-// get all items
-app.get("/api/media", getItems);
-// get items by id
-app.get("/api/media/:id", getItemsById);
-// modify
-app.put("/api/media", putItem);
-// add new item
-app.post("/api/media", postItem);
-// remove existing item
-app.delete("/api/media", deleteItem);
+// media endpoints
+app.use("/api/media", mediaRouter);
 
 // get all items
 app.get("/api/user", getUsers);

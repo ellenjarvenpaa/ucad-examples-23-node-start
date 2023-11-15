@@ -31,7 +31,9 @@ CREATE TABLE UserRelationships (
     FollowingUserID INT,
     RelationshipStatus ENUM('Pending', 'Accepted', 'Declined') DEFAULT 'Pending',
     RequestDate TIMESTAMP,
-    AcceptanceDate TIMESTAMP
+    AcceptanceDate TIMESTAMP,
+    FOREIGN KEY (FollowerUserID) REFERENCES Users(user_id),
+    FOREIGN KEY (FollowingUserID) REFERENCES Users(user_id)
 );
 
 -- add users
@@ -48,9 +50,13 @@ INSERT INTO MediaItems (filename, filesize, title, description, user_id, media_t
 
 
 -- add user relationship data
-INSERT INTO UserRelationships (FollowerUserID, FollowingUserID, RelationshipStatus, RequestDate, AcceptanceDate)
-VALUES (260, 305, 'Accepted', '2023-11-08 10:00:00', '2023-11-08 10:05:00'),
-      (305, 260, 'Accepted', '2023-11-08 11:00:00', '2023-11-08 11:05:00');
+INSERT INTO UserRelationships (FollowerUserID, FollowingUserID, 
+RelationshipStatus, RequestDate, AcceptanceDate)
+VALUES (260, 305, 'Accepted', null, null),
+       (305, 260, 'Declined', null, null);
 
+SELECT RelationshipStatus FROM UserRelationships WHERE FollowerUserID = 260;
+UPDATE UserRelationships SET RelationshipStatus = 'Pending' WHERE FollowerUserID = 305;
+DELETE FROM UserRelationships WHERE RelationshipStatus = 'Pending';
 
 
