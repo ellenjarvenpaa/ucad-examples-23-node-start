@@ -7,7 +7,7 @@ GET http://localhost:3000
 GET http://localhost:3000/api/media
 
 ### GET /media/:id
-GET http://localhost:3000/api/media/9590
+GET http://localhost:3000/api/media/1
 
 ### POST /media
 POST http://localhost:3000/api/media
@@ -34,10 +34,10 @@ POST http://localhost:3000/api/media
 {"jotain": "jotain"}
 
 ### DELETE /media/:id
-DELETE http://localhost:3000/api/media/9590
+DELETE http://localhost:3000/api/media/1
 
 ### PUT /media/:id
-PUT http://localhost:3000/api/media/9590
+PUT http://localhost:3000/api/media/1
 content-type: application/json
 
 {
@@ -51,7 +51,7 @@ content-type: application/json
 GET http://localhost:3000/api/user
 
 ### GET /user/:id
-GET http://localhost:3000/api/user/260
+GET http://localhost:3000/api/user/1
 
 ### POST /user
 POST http://localhost:3000/api/user
@@ -69,10 +69,10 @@ POST http://localhost:3000/api/user
 {"jotain": "jotain"}
 
 ### DELETE /user/:id
-DELETE http://localhost:3000/api/user/260
+DELETE http://localhost:3000/api/user/1
 
 ### PUT /user/:id
-PUT http://localhost:3000/api/user/260
+PUT http://localhost:3000/api/user/1
 content-type: application/json
 
 {

@@ -1,11 +1,11 @@
-import { Express } from "express";
+import Express from "express";
 import {
   getUsers,
   getUserById,
-  putUser,
   postUser,
   deleteUser,
-} from "../controllers/user-controller.mjs";
+  putUser,
+} from "../controllers/users-controller.mjs";
 
 const userRouter = Express.Router();
 

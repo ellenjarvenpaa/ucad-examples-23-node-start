@@ -1,79 +1,22 @@
-const mediaItems = [
-  {
-    media_id: 9632,
-    filename: "ffd8.jpg",
-    filesize: 887574,
-    title: "Favorite drink",
-    description: "",
-    user_id: 1606,
-    media_type: "image/jpeg",
-    created_at: "2023-10-16T19:00:09.000Z",
-  },
-  {
-    media_id: 9626,
-    filename: "dbbd.jpg",
-    filesize: 60703,
-    title: "Miika",
-    description: "My Photo",
-    user_id: 3671,
-    media_type: "image/jpeg",
-    created_at: "2023-10-13T12:14:26.000Z",
-  },
-  {
-    media_id: 9625,
-    filename: "2f9b.jpg",
-    filesize: 30635,
-    title: "Aksux",
-    description: "friends",
-    user_id: 260,
-    media_type: "image/jpeg",
-    created_at: "2023-10-12T20:03:08.000Z",
-  },
-  {
-    media_id: 9592,
-    filename: "f504.jpg",
-    filesize: 48975,
-    title: "Desert",
-    description: "",
-    user_id: 3609,
-    media_type: "image/jpeg",
-    created_at: "2023-10-12T06:59:05.000Z",
-  },
-  {
-    media_id: 9590,
-    filename: "60ac.jpg",
-    filesize: 23829,
-    title: "Basement",
-    description: "Light setup in basement",
-    user_id: 305,
-    media_type: "image/jpeg",
-    created_at: "2023-10-12T06:56:41.000Z",
-  },
-];
+import {
+  addMedia,
+  fetchAllMedia,
+  fetchMediaById,
+  deleteMediaById,
+  updateMedia,
+} from "../models/media-model.mjs";
 
-/**
- * Gets all items
- *
- * @param {object} req - http request
- * @param {object} res - http response
- */
-const getItems = (req, res) => {
-  const limit = req.query.limit;
-  // TODO: check that the param value is int before using
-  if (limit) {
-    res.json(mediaItems.slice(0, limit));
-  } else {
-    res.json(mediaItems);
-  }
+const getItems = async (req, res) => {
+  const mediaItems = await fetchAllMedia();
+  res.json(mediaItems);
 };
 
-/**
- *
- * @param {*} req
- * @param {*} res
- */
-const getItemsById = (req, res) => {
-  const item = mediaItems.find((element) => element.media_id == req.params.id);
+const getItemsById = async (req, res) => {
+  const item = await fetchMediaById(req.params.id);
+  if (item.error) {
+    res.status(500);
+    res.json(item);
+  }
   if (item) {
     res.json(item);
   } else {
@@ -81,41 +24,37 @@ const getItemsById = (req, res) => {
   }
 };
 
-const postItem = (req, res) => {
+const postItem = async (req, res) => {
   console.log("uploaded file", req.file);
   console.log("uploaded form", req.body);
   console.log("new item posted", req.body);
   const { title, description, user_id } = req.body;
   const { filename, mimetype, size } = req.body;
-  const newId = mediaItems[0].media_id + 1;
   if (filename && title && user_id) {
-    mediaItems.unshift({
-      media_id: newId,
-      filename,
-      title,
-      description,
-      user_id,
-      media_type: mimetype,
-      filesize: size,
-    });
+    const newMedia = { title, description, user_id, filename, mimetype, size };
+    const result = await addMedia(newMedia);
     res.status(201);
-    res.json({ message: "New media item added.", media_id: newId });
+    res.json({ message: "New media item added.", ...result });
   } else {
     res.sendStatus(400);
   }
 };
 
-const deleteItem = (req, res, id) => {
-  const index = mediaItems.findIndex((item) => item.media_id == id);
-  if (index !== -1) {
-    mediaItems.splice(index, 1);
-    res.status(200).json({ message: `Item with id ${id} deleted.` });
-  } else {
-    res.status(404).json({ message: "Item not found." });
+const deleteItem = async (req, res, id) => {
+  try {
+    const result = await deleteMediaById(id);
+    if (result.success) {
+      res.status(200).json({ message: `Item with id ${id} deleted.` });
+    } else {
+      res.status(404).json({ message: "Item not found." });
+    }
+  } catch (error) {
+    console.error("error", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-const putItem = (req, res, id) => {
+const putItem = async (req, res, id) => {
   let body = [];
   req
     .on("error", (err) => {
@@ -124,7 +63,7 @@ const putItem = (req, res, id) => {
     .on("data", (chunk) => {
       body.push(chunk);
     })
-    .on("end", () => {
+    .on("end", async () => {
       body = Buffer.concat(body).toString();
       console.log("req body", body);
       body = JSON.parse(body);
@@ -132,13 +71,17 @@ const putItem = (req, res, id) => {
         res.status(400).json({ message: "Missing data." });
         return;
       }
-      const index = mediaItems.findIndex((item) => item.media_id == id);
-      if (index !== -1) {
-        mediaItems[index].title = body.title;
-        mediaItems[index].description = body.description;
-        res.status(200).json({ message: `Item with id ${id} updated.` });
-      } else {
-        res.status(404).json({ message: "Item not found." });
+
+      try {
+        const result = await updateMedia(id, body);
+        if (result.success) {
+          res.status(200).json({ message: `Item with id ${id} updated.` });
+        } else {
+          res.status(404).json({ message: "Item not found." });
+        }
+      } catch (error) {
+        console.error("error", error);
+        res.status(500).json({ error: "Internal Server Error" });
       }
     });
 };
