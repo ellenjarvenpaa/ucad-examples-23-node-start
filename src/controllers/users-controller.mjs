@@ -1,3 +1,4 @@
+import { validationResult } from "express-validator";
 import {
   fetchAllUsers,
   fetchUserById,
@@ -25,27 +26,18 @@ const getUserById = async (req, res) => {
 };
 
 const postUser = async (req, res) => {
-  console.log("new user posted", req.body);
-  const { username, password, email, user_level_id } = req.body;
-
-  if (username && password && email && user_level_id) {
-    const newUser = {
-      username,
-      password,
-      email,
-      user_level_id,
-    };
-
-    try {
-      const result = await addUser(newUser);
-      res.status(201).json({ user_id: result.user_id });
-    } catch (error) {
-      console.error("error", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  } else {
-    res.status(400).json({ message: "Missing data." });
+  // validation errors can be retrieved from the request object (added by express-validator middleware)
+  const errors = validationResult(req);
+  // check if any validation errors
+  if (!errors.isEmpty()) {
+    // pass the error to the error handler middleware
+    const error = new Error("Invalid or missing fields");
+    error.status = 400;
+    return next(error);
   }
+  // TODO: add password hashing here and error handling for SQL errors
+  const newUserId = await addUser(req.body);
+  res.json({ message: "new user added", user_id: newUserId });
 };
 
 const deleteUser = async (req, res, id) => {

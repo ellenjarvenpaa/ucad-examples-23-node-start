@@ -5,6 +5,7 @@ import {
   deleteMediaById,
   updateMedia,
 } from "../models/media-model.mjs";
+import { validationResult } from "express-validator";
 
 const getItems = async (req, res) => {
   const mediaItems = await fetchAllMedia();
@@ -25,19 +26,30 @@ const getItemsById = async (req, res) => {
 };
 
 const postItem = async (req, res) => {
-  console.log("uploaded file", req.file);
-  console.log("uploaded form", req.body);
-  console.log("new item posted", req.body);
-  const { title, description, user_id } = req.body;
-  const { filename, mimetype, size } = req.body;
-  if (filename && title && user_id) {
-    const newMedia = { title, description, user_id, filename, mimetype, size };
-    const result = await addMedia(newMedia);
-    res.status(201);
-    res.json({ message: "New media item added.", ...result });
-  } else {
-    res.sendStatus(400);
+  // check if file is rejected by multer
+  if (!req.file) {
+    const error = new Error("Invalid or missing file");
+    error.status = 400;
+    next(error);
   }
+  const errors = validationResult(req);
+  // check if any validation errors
+  if (!errors.isEmpty()) {
+    console.log("postMedia errors", errors.array());
+    const error = new Error("Invalid or missing fields");
+    error.status = 400;
+    return next(error);
+  }
+  const { title, description } = req.body;
+  const { filename, mimetype, size } = req.file;
+  // req.user is added by authenticateToken middleware
+  const user_id = req.user.user_id;
+  const newMedia = { title, description, user_id, filename, mimetype, size };
+  const result = await addMedia(newMedia);
+  if (result.error) {
+    return next(new Error(result.error));
+  }
+  res.status(201).json({ message: "New media item added.", ...result });
 };
 
 const deleteItem = async (req, res, id) => {

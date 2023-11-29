@@ -1,5 +1,26 @@
 import { promisePool } from "../utils/database.mjs";
 
+/**
+ *Fetch user from database based on username/password pair
+ *
+ * @param {object} userCreds - {username, password} properties
+ * @returns user object
+ */
+const login = async (userCreds) => {
+  try {
+    const sql = `SELECT user_id, username, user_level_id, email 
+                  FROM Users WHERE username =? AND password =?`;
+    const params = [userCreds.username, userCreds.password];
+    const result = await promisePool.query(sql, params);
+    const [rows] = result;
+    console.log("rows", rows);
+    return rows[0];
+  } catch (e) {
+    console.error("error", e.message);
+    return { error: e.message };
+  }
+};
+
 const fetchAllUsers = async () => {
   try {
     const [rows] = await promisePool.query("SELECT * FROM users");
@@ -68,4 +89,11 @@ const updateUser = async (id, updatedUser) => {
   }
 };
 
-export { fetchAllUsers, fetchUserById, addUser, deleteUserById, updateUser };
+export {
+  login,
+  fetchAllUsers,
+  fetchUserById,
+  addUser,
+  deleteUserById,
+  updateUser,
+};
