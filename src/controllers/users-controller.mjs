@@ -6,6 +6,7 @@ import {
   deleteUserById,
   updateUser,
 } from "../models/user-model.mjs";
+import bcrypt from "bcryptjs";
 
 const getUsers = async (req, res) => {
   const users = await fetchAllUsers();
@@ -26,18 +27,19 @@ const getUserById = async (req, res) => {
 };
 
 const postUser = async (req, res) => {
-  // validation errors can be retrieved from the request object (added by express-validator middleware)
   const errors = validationResult(req);
-  // check if any validation errors
   if (!errors.isEmpty()) {
-    // pass the error to the error handler middleware
-    const error = new Error("Invalid or missing fields");
-    error.status = 400;
-    return next(error);
+    // details about errors:
+    console.log(errors.array());
+    return res.status(400).json({ message: "invalid input fields" });
   }
-  // TODO: add password hashing here and error handling for SQL errors
-  const newUserId = await addUser(req.body);
-  res.json({ message: "new user added", user_id: newUserId });
+  const newUser = req.body;
+  const salt = await bcrypt.genSalt(10);
+  // replace plain text password with hash
+  newUser.password = await bcrypt.hash(newUser.password, salt);
+  // console.log('postUser', newUser);
+  const newUserId = await addUser(newUser);
+  res.status(201).json({ message: "user added", user_id: newUserId });
 };
 
 const deleteUser = async (req, res, id) => {
