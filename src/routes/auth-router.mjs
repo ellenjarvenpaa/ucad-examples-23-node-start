@@ -27,7 +27,7 @@ const authRouter = Express.Router();
  */
 
 /**
- * @api {post} /login Login
+ * @api {post} /api/auth/login Login
  * @apiVersion 1.0.0
  * @apiName PostLogin
  * @apiGroup Authentication
@@ -65,6 +65,7 @@ const authRouter = Express.Router();
  *
  * @apiUse UnauthorizedError
  */
+
 authRouter.route("/login").post(postLogin);
 
 /**
